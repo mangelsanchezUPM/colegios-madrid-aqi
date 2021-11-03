@@ -8,11 +8,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.security.cert.CertificateException;
 import java.util.List;
+import java.util.Objects;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -54,13 +57,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build();
         apiServiceColegios = retrofitStatic.create(IColegiosRESTAPIService.class);
         colegioViewModel = new ViewModelProvider(this).get(ColegioViewModel.class);
+        final RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        final ColegioListAdapter adapter = new ColegioListAdapter(this);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         getColegios();
+        colegioViewModel.getAllColegios().observe(this, adapter::setColegios);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-  //      mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+        //      mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
     }
 
     @Override
@@ -88,12 +96,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onResponse(Call<Colegios> call, Response<Colegios> response) {
                 assert response.body() != null;
                 List<Graph> colegios = response.body().getGraph();
-                for (Graph colegioGraph : colegios) {
-                    Log.i(LOG_TAG, colegioGraph.getTitle());
-                    Colegio colegio = new Colegio(colegioGraph.getTitle(),
-                            colegioGraph.getLocation().getLatitude().floatValue(),
-                            colegioGraph.getLocation().getLongitude().floatValue());
-                    colegioViewModel.insert(colegio);
+                if (colegioViewModel.getAllColegios().getValue() != null &&
+                        colegioViewModel.getAllColegios().getValue().isEmpty()) {
+                    for (Graph colegioGraph : colegios) {
+                        Log.i(LOG_TAG, colegioGraph.getTitle());
+                        Colegio colegio = new Colegio(colegioGraph.getTitle(),
+                                colegioGraph.getLocation().getLatitude().floatValue(),
+                                colegioGraph.getLocation().getLongitude().floatValue());
+                        colegioViewModel.insert(colegio);
+                    }
                 }
             }
 
