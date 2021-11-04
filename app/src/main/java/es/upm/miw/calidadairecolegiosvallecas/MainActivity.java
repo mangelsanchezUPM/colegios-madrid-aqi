@@ -1,6 +1,5 @@
 package es.upm.miw.calidadairecolegiosvallecas;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -24,7 +23,9 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import es.upm.miw.calidadairecolegiosvallecas.models.ColegioContaminacion;
 import es.upm.miw.calidadairecolegiosvallecas.models.Colegios;
+import es.upm.miw.calidadairecolegiosvallecas.models.Contaminacion;
 import es.upm.miw.calidadairecolegiosvallecas.models.Graph;
 import es.upm.miw.calidadairecolegiosvallecas.room.Colegio;
 import es.upm.miw.calidadairecolegiosvallecas.room.ColegioViewModel;
@@ -37,32 +38,42 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     final static String LOG_TAG = "MiW";
+
     private static final String API_STATIC_BASE_URL = "https://datos.madrid.es/egob/catalogo/";
 
+    private static final String API_DYNAMIC_BASE_URL = "https://api.openweathermap.org/data/2.5/";
+    private static final String API_DYNAMIC_KEY = "54c07990ccb655e3e2e98f7fba2e2438";
+
     private IColegiosRESTAPIService apiServiceColegios;
+    private IContaminacionRESTAPIService apiServiceContaminacion;
+    private ColegioListAdapter adapter;
+    private ColegioViewModel colegioViewModel;
+
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-    private ColegioViewModel colegioViewModel;
     private static final int RC_SIGN_IN = 2018;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Retrofit retrofitDynamic = new Retrofit.Builder()
+                .baseUrl(API_DYNAMIC_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
         Retrofit retrofitStatic = new Retrofit.Builder()
                 .baseUrl(API_STATIC_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(getUnsafeOkHttpClient())
                 .build();
+        apiServiceContaminacion = retrofitDynamic.create(IContaminacionRESTAPIService.class);
         apiServiceColegios = retrofitStatic.create(IColegiosRESTAPIService.class);
         colegioViewModel = new ViewModelProvider(this).get(ColegioViewModel.class);
         final RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        final ColegioListAdapter adapter = new ColegioListAdapter(this);
+        adapter = new ColegioListAdapter(this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        getColegios();
-        colegioViewModel.getAllColegios().observe(this, adapter::setColegios);
+        fetchColegios();
+        colegioViewModel.getAllColegios().observe(this, this::fetchContaminacion);
     }
 
     @Override
@@ -87,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void getColegios() {
+    private void fetchColegios() {
         // Retrofit call
         Call<Colegios> call_async = apiServiceColegios.getColegios();
         call_async.enqueue(new Callback<Colegios>() {
@@ -120,46 +131,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+    private void fetchContaminacion(List<Colegio> colegios) {
+        // Retrofit call
+        List<ColegioContaminacion> colegioContaminacionList = new ArrayList<>();
+        for (Colegio colegio : colegios) {
+            Call<Contaminacion> call_async = apiServiceContaminacion
+                    .getContaminacion(colegio.getLatitud().toString(),
+                            colegio.getLongitud().toString(),
+                            API_DYNAMIC_KEY);
 
-    private static OkHttpClient getUnsafeOkHttpClient() {
-        try {
-            // Create a trust manager that does not validate certificate chains
-            final TrustManager[] trustAllCerts = new TrustManager[]{
-                    new X509TrustManager() {
-                        @Override
-                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-                        }
-
-                        @Override
-                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-                        }
-
-                        @Override
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                            return new java.security.cert.X509Certificate[]{};
-                        }
-                    }
-            };
-
-            // Install the all-trusting trust manager
-            final SSLContext sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-            // Create an ssl socket factory with our all-trusting manager
-            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
-
-            OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
-            builder.hostnameVerifier(new HostnameVerifier() {
+            call_async.enqueue(new Callback<Contaminacion>() {
                 @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
+                public void onResponse(Call<Contaminacion> call, Response<Contaminacion> response) {
+                    assert response.body() != null;
+                    es.upm.miw.calidadairecolegiosvallecas.models.List contaminacion = response.body().getList().get(0);
+                    ColegioContaminacion cc = new ColegioContaminacion(
+                            colegio.getNombre(),
+                            contaminacion.getMain().getAqi(),
+                            contaminacion.getComponents()
+                    );
+                    colegioContaminacionList.add(cc);
+                    adapter.setColegioContaminacionList(colegioContaminacionList);
+                }
+
+                @Override
+                public void onFailure(Call<Contaminacion> call, Throwable t) {
+                    Toast.makeText(
+                            getApplicationContext(),
+                            "ERROR: " + t.getMessage(),
+                            Toast.LENGTH_LONG
+                    ).show();
+                    Log.e(LOG_TAG, t.getMessage());
                 }
             });
-
-            OkHttpClient okHttpClient = builder.build();
-            return okHttpClient;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 }

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import es.upm.miw.calidadairecolegiosvallecas.models.ColegioContaminacion;
 import es.upm.miw.calidadairecolegiosvallecas.room.Colegio;
 
 public class ColegioListAdapter extends RecyclerView.Adapter<ColegioListAdapter.ColegioViewHolder> {
@@ -27,7 +28,7 @@ public class ColegioListAdapter extends RecyclerView.Adapter<ColegioListAdapter.
     }
 
     private final LayoutInflater mInflater;
-    private List<Colegio> mColegios;
+    private List<ColegioContaminacion> colegioContaminacionList;
 
     public ColegioListAdapter(Context context) {
         mInflater = LayoutInflater.from(context);
@@ -42,21 +43,22 @@ public class ColegioListAdapter extends RecyclerView.Adapter<ColegioListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ColegioViewHolder holder, int position) {
-        if (mColegios != null) {
-            Colegio current = mColegios.get(position);
+        if (colegioContaminacionList != null) {
+            ColegioContaminacion current = colegioContaminacionList.get(position);
             holder.nombreColegio.setText(current.getNombre());
+            holder.contaminacion.setText(current.getAqi().toString());
         }
     }
 
     @Override
     public int getItemCount() {
-        return (mColegios == null)
+        return (colegioContaminacionList == null)
                 ? 0
-                : mColegios.size();
+                : colegioContaminacionList.size();
     }
 
-    public void setColegios(List<Colegio> colegios){
-        mColegios = colegios;
+    public void setColegioContaminacionList(List<ColegioContaminacion> colegioContaminacionList) {
+        this.colegioContaminacionList = colegioContaminacionList;
         notifyDataSetChanged();
     }
 }
