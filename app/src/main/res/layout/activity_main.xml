@@ -20,19 +20,27 @@
 
 
             <EditText
-                android:id="@+id/editTextTextPersonName"
+                android:id="@+id/etNombreColegio"
                 android:layout_width="0dp"
-                android:layout_weight="5"
+                android:layout_weight="10"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:inputType="textPersonName" />
+                android:inputType="text" />
 
             <Button
-                android:id="@+id/button"
-                android:layout_width="wrap_content"
+                android:id="@+id/btnBuscar"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Buscar" />
+                android:layout_weight="4"
+                android:text="Buscar"
+                android:onClick="buscarColegio"/>
+            <Button
+                android:id="@+id/btnLimpiar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="🗑️"
+                android:onClick="limpiarColegios"/>
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView

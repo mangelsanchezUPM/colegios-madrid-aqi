@@ -1,8 +1,11 @@
 package es.upm.miw.calidadairecolegiosvallecas;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +17,8 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 import es.upm.miw.calidadairecolegiosvallecas.models.ColegioContaminacion;
 import es.upm.miw.calidadairecolegiosvallecas.models.Colegios;
@@ -27,9 +32,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
     final static String LOG_TAG = "MiW";
-
     private static final String API_STATIC_BASE_URL = "https://datos.madrid.es/egob/catalogo/";
 
     private static final String API_DYNAMIC_BASE_URL = "https://api.openweathermap.org/data/2.5/";
@@ -40,6 +44,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ColegioListAdapter adapter;
     private ColegioViewModel colegioViewModel;
 
+    private List<ColegioContaminacion> colegioContaminacionList;
+    private Button btnBuscar;
+    private EditText etNombreColegio;
+
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private static final int RC_SIGN_IN = 2018;
@@ -48,6 +56,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        btnBuscar = findViewById(R.id.btnBuscar);
+        etNombreColegio = findViewById(R.id.etNombreColegio);
+
         Retrofit retrofitDynamic = new Retrofit.Builder()
                 .baseUrl(API_DYNAMIC_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -79,16 +90,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
-    @Override
-    public void onClick(View view) {
-
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
-    }
-
     private void fetchColegios() {
         // Retrofit call
         Call<Colegios> call_async = apiServiceColegios.getColegios();
@@ -101,7 +102,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (colegioViewModel.getAllColegios().getValue() != null &&
                         colegioViewModel.getAllColegios().getValue().isEmpty()) {
                     for (Graph colegioGraph : colegios) {
-                        Log.i(LOG_TAG, colegioGraph.getTitle());
                         Colegio colegio = new Colegio(colegioGraph.getTitle(),
                                 colegioGraph.getLocation().getLatitude().floatValue(),
                                 colegioGraph.getLocation().getLongitude().floatValue());
@@ -122,9 +122,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+    public void buscarColegio(View v) {
+        String colegioNombre = this.etNombreColegio.getText().toString();
+        if (colegioNombre.isEmpty()) {
+            adapter.setColegioContaminacionList(colegioContaminacionList);
+            return;
+        }
+
+        List<ColegioContaminacion> filteredList = new ArrayList<ColegioContaminacion>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            filteredList = colegioContaminacionList.stream()
+                    .filter(colegioContaminacion ->
+                            colegioContaminacion.getNombre().toLowerCase()
+                                    .contains(colegioNombre.toLowerCase()))
+                    .collect(Collectors.toList());
+        } else {
+            filteredList = new ArrayList<ColegioContaminacion>();
+            for (ColegioContaminacion colegioContaminacion : colegioContaminacionList) {
+                if (colegioContaminacion.getNombre().toLowerCase()
+                        .contains(colegioNombre.toLowerCase()))
+                    filteredList.add(colegioContaminacion);
+            }
+        }
+        adapter.setColegioContaminacionList(filteredList);
+    }
+
+    public void limpiarColegios(View v) {
+        etNombreColegio.setText("");
+        adapter.setColegioContaminacionList(colegioContaminacionList);
+    }
+
     private void fetchContaminacion(List<Colegio> colegios) {
         // Retrofit call
-        List<ColegioContaminacion> colegioContaminacionList = new ArrayList<>();
+        colegioContaminacionList = new ArrayList<>();
         for (Colegio colegio : colegios) {
             Call<Contaminacion> call_async = apiServiceContaminacion
                     .getContaminacion(colegio.getLatitud().toString(),
