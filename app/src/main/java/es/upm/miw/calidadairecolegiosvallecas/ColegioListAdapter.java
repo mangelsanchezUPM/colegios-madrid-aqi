@@ -1,9 +1,11 @@
 package es.upm.miw.calidadairecolegiosvallecas;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,12 +20,12 @@ public class ColegioListAdapter extends RecyclerView.Adapter<ColegioListAdapter.
 
     class ColegioViewHolder extends RecyclerView.ViewHolder {
         private final TextView nombreColegio;
-        private final TextView contaminacion;
+        private final LinearLayout contaminacionBackground;
 
         private ColegioViewHolder(View itemView) {
             super(itemView);
             nombreColegio = itemView.findViewById(R.id.nombreColegio);
-            contaminacion = itemView.findViewById(R.id.contaminacion);
+            contaminacionBackground = itemView.findViewById(R.id.item_background);
         }
     }
 
@@ -46,7 +48,12 @@ public class ColegioListAdapter extends RecyclerView.Adapter<ColegioListAdapter.
         if (colegioContaminacionList != null) {
             ColegioContaminacion current = colegioContaminacionList.get(position);
             holder.nombreColegio.setText(current.getNombre());
-            holder.contaminacion.setText(current.getAqi().toString());
+            if (current.getAqi() < 2)
+                holder.contaminacionBackground.setBackgroundColor(Color.parseColor("#76DA6B"));
+            if (current.getAqi() == 2)
+                holder.contaminacionBackground.setBackgroundColor(Color.parseColor("#DAC26B"));
+            if (current.getAqi() > 2)
+                holder.contaminacionBackground.setBackgroundColor(Color.parseColor("#DA6B6B"));
         }
     }
 

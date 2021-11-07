@@ -12,16 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import es.upm.miw.calidadairecolegiosvallecas.models.ColegioContaminacion;
 import es.upm.miw.calidadairecolegiosvallecas.models.Colegios;
@@ -29,7 +21,6 @@ import es.upm.miw.calidadairecolegiosvallecas.models.Contaminacion;
 import es.upm.miw.calidadairecolegiosvallecas.models.Graph;
 import es.upm.miw.calidadairecolegiosvallecas.room.Colegio;
 import es.upm.miw.calidadairecolegiosvallecas.room.ColegioViewModel;
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
