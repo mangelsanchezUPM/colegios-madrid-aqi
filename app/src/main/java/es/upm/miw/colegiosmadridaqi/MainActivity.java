@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -69,7 +68,13 @@ public class MainActivity extends AppCompatActivity {
         btnBuscar = findViewById(R.id.btnBuscar);
         etNombreColegio = findViewById(R.id.etNombreColegio);
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mAuthStateListener = firebaseAuth -> user = firebaseAuth.getCurrentUser();
+        mAuthStateListener = firebaseAuth -> {
+            user = firebaseAuth.getCurrentUser();
+            if (user == null)
+                Toast.makeText(getApplicationContext(), "Sesión cerrada", Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(getApplicationContext(), "Sesión iniciada como " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+        };
         Retrofit retrofitDynamic = new Retrofit.Builder()
                 .baseUrl(API_DYNAMIC_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -112,14 +117,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void iniciarSesion() {
         startActivityForResult(
-                // Get an instance of AuthUI based on the default app
                 AuthUI.getInstance().
                         createSignInIntentBuilder().
                         setAvailableProviders(Arrays.asList(
                                 new AuthUI.IdpConfig.GoogleBuilder().build(),
                                 new AuthUI.IdpConfig.EmailBuilder().build()
                         )).
-                        setIsSmartLockEnabled(!BuildConfig.DEBUG /* credentials */, true /* hints */).
+                        setIsSmartLockEnabled(!BuildConfig.DEBUG, true).
                         build(),
                 RC_SIGN_IN
         );
@@ -142,7 +146,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchColegios() {
-        // Retrofit call
         Call<Colegios> call_async = apiServiceColegios.getColegios();
         call_async.enqueue(new Callback<Colegios>() {
 
@@ -225,11 +228,6 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<Contaminacion> call, Throwable t) {
-                    Toast.makeText(
-                            getApplicationContext(),
-                            "ERROR: " + t.getMessage(),
-                            Toast.LENGTH_LONG
-                    ).show();
                     Log.e(LOG_TAG, t.getMessage());
                 }
             });
