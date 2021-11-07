@@ -1,0 +1,46 @@
+
+package es.upm.miw.colegiosmadridaqi.models;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import javax.annotation.Generated;
+
+@Generated("jsonschema2pojo")
+public class Graph {
+
+    @SerializedName("@id")
+    @Expose
+    private String id;
+    @SerializedName("title")
+    @Expose
+    private String title;
+    @SerializedName("location")
+    @Expose
+    private Location location;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+}
