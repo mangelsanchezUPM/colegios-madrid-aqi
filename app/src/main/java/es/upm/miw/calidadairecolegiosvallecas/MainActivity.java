@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 import es.upm.miw.calidadairecolegiosvallecas.models.ColegioContaminacion;
 import es.upm.miw.calidadairecolegiosvallecas.models.Colegios;
 import es.upm.miw.calidadairecolegiosvallecas.models.Contaminacion;
-import es.upm.miw.calidadairecolegiosvallecas.models.Data;
 import es.upm.miw.calidadairecolegiosvallecas.models.Graph;
 import es.upm.miw.calidadairecolegiosvallecas.models.Iaqi;
 import es.upm.miw.calidadairecolegiosvallecas.room.Colegio;
@@ -59,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         btnBuscar = findViewById(R.id.btnBuscar);
         etNombreColegio = findViewById(R.id.etNombreColegio);
-
         Retrofit retrofitDynamic = new Retrofit.Builder()
                 .baseUrl(API_DYNAMIC_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -161,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
             Call<Contaminacion> call_async = apiServiceContaminacion
                     .getContaminacion(colegio.getLatitud(),
                             colegio.getLongitud(),
-                            "14a282117d56847c14ed1f76e885fc6e9078450a");
+                            API_DYNAMIC_KEY);
 
             call_async.enqueue(new Callback<Contaminacion>() {
                 @Override

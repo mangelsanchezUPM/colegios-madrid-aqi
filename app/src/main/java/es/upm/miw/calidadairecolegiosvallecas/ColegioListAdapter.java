@@ -47,17 +47,29 @@ public class ColegioListAdapter extends RecyclerView.Adapter<ColegioListAdapter.
         if (colegioContaminacionList != null) {
             ColegioContaminacion current = colegioContaminacionList.get(position);
             String emoji = "";
-            if (current.getAqi() < 2) {
-                holder.contaminacionBackground.setBackgroundColor(Color.parseColor("#76DA6B"));
-                emoji = "\uD83D\uDE03";
+            if (current.getAqi() < 33) {
+                holder.contaminacionBackground.setBackgroundColor(holder.itemView.getResources().getColor(R.color.very_good));
+                emoji = "\uD83D\uDE0A";
             }
-            if (current.getAqi() == 2) {
-                holder.contaminacionBackground.setBackgroundColor(Color.parseColor("#DAC26B"));
+            if (current.getAqi() > 33 && current.getAqi() < 66) {
+                holder.contaminacionBackground.setBackgroundColor(holder.itemView.getResources().getColor(R.color.good));
+                emoji = "\uD83D\uDE00";
+            }
+            if (current.getAqi() > 66 && current.getAqi() < 100) {
+                holder.contaminacionBackground.setBackgroundColor(holder.itemView.getResources().getColor(R.color.fair));
                 emoji = "\uD83D\uDE10";
             }
-            if (current.getAqi() > 2) {
-                holder.contaminacionBackground.setBackgroundColor(Color.parseColor("#DA6B6B"));
-                emoji = "\uD83D\uDE14";
+            if (current.getAqi() > 100 && current.getAqi() < 150) {
+                holder.contaminacionBackground.setBackgroundColor(holder.itemView.getResources().getColor(R.color.poor));
+                emoji = "\uD83D\uDE41";
+            }
+            if (current.getAqi() > 150 && current.getAqi() < 200) {
+                holder.contaminacionBackground.setBackgroundColor(holder.itemView.getResources().getColor(R.color.very_poor));
+                emoji = "\uD83D\uDE1F";
+            }
+            if (current.getAqi() > 200) {
+                holder.contaminacionBackground.setBackgroundColor(holder.itemView.getResources().getColor(R.color.hazardous));
+                emoji = "\uD83D\uDE31";
             }
             holder.nombreColegio.setText(current.getNombre() + "\n" + emoji);
         }
