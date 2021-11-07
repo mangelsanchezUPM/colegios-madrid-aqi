@@ -4,12 +4,12 @@ public class ColegioContaminacion {
 
     private String nombre;
     private Integer aqi;
-    private Components components;
+    private Iaqi iaqi;
 
-    public ColegioContaminacion(String nombre, Integer aqi, Components components) {
+    public ColegioContaminacion(String nombre, Integer aqi, Iaqi iaqi) {
         this.nombre = nombre;
         this.aqi = aqi;
-        this.components = components;
+        this.iaqi = iaqi;
     }
 
     public String getNombre() {
@@ -28,11 +28,11 @@ public class ColegioContaminacion {
         this.aqi = aqi;
     }
 
-    public Components getComponents() {
-        return components;
+    public Iaqi getIaqi() {
+        return iaqi;
     }
 
-    public void setComponents(Components components) {
-        this.components = components;
+    public void setIaqi(Iaqi iaqi) {
+        this.iaqi = iaqi;
     }
 }

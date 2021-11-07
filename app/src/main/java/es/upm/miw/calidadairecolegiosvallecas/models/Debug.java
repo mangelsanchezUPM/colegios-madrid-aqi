@@ -6,18 +6,18 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 @Generated("jsonschema2pojo")
-public class Main {
+public class Debug {
 
-    @SerializedName("aqi")
+    @SerializedName("sync")
     @Expose
-    private Integer aqi;
+    private String sync;
 
-    public Integer getAqi() {
-        return aqi;
+    public String getSync() {
+        return sync;
     }
 
-    public void setAqi(Integer aqi) {
-        this.aqi = aqi;
+    public void setSync(String sync) {
+        this.sync = sync;
     }
 
 }

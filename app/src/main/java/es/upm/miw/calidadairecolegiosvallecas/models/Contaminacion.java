@@ -8,27 +8,27 @@ import com.google.gson.annotations.SerializedName;
 @Generated("jsonschema2pojo")
 public class Contaminacion {
 
-    @SerializedName("coord")
+    @SerializedName("status")
     @Expose
-    private Coord coord;
-    @SerializedName("list")
+    private String status;
+    @SerializedName("data")
     @Expose
-    private java.util.List<es.upm.miw.calidadairecolegiosvallecas.models.List> list = null;
+    private Data data;
 
-    public Coord getCoord() {
-        return coord;
+    public String getStatus() {
+        return status;
     }
 
-    public void setCoord(Coord coord) {
-        this.coord = coord;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    public java.util.List<es.upm.miw.calidadairecolegiosvallecas.models.List> getList() {
-        return list;
+    public Data getData() {
+        return data;
     }
 
-    public void setList(java.util.List<es.upm.miw.calidadairecolegiosvallecas.models.List> list) {
-        this.list = list;
+    public void setData(Data data) {
+        this.data = data;
     }
 
 }

@@ -17,13 +17,14 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 import es.upm.miw.calidadairecolegiosvallecas.models.ColegioContaminacion;
 import es.upm.miw.calidadairecolegiosvallecas.models.Colegios;
 import es.upm.miw.calidadairecolegiosvallecas.models.Contaminacion;
+import es.upm.miw.calidadairecolegiosvallecas.models.Data;
 import es.upm.miw.calidadairecolegiosvallecas.models.Graph;
+import es.upm.miw.calidadairecolegiosvallecas.models.Iaqi;
 import es.upm.miw.calidadairecolegiosvallecas.room.Colegio;
 import es.upm.miw.calidadairecolegiosvallecas.room.ColegioViewModel;
 import retrofit2.Call;
@@ -36,8 +37,8 @@ public class MainActivity extends AppCompatActivity {
     final static String LOG_TAG = "MiW";
     private static final String API_STATIC_BASE_URL = "https://datos.madrid.es/egob/catalogo/";
 
-    private static final String API_DYNAMIC_BASE_URL = "https://api.openweathermap.org/data/2.5/";
-    private static final String API_DYNAMIC_KEY = "54c07990ccb655e3e2e98f7fba2e2438";
+    private static final String API_DYNAMIC_BASE_URL = "https://api.waqi.info/";
+    private static final String API_DYNAMIC_KEY = "14a282117d56847c14ed1f76e885fc6e9078450a";
 
     private IColegiosRESTAPIService apiServiceColegios;
     private IContaminacionRESTAPIService apiServiceContaminacion;
@@ -155,22 +156,20 @@ public class MainActivity extends AppCompatActivity {
     private void fetchContaminacion(List<Colegio> colegios) {
         // Retrofit call
         colegioContaminacionList = new ArrayList<>();
+
         for (Colegio colegio : colegios) {
             Call<Contaminacion> call_async = apiServiceContaminacion
-                    .getContaminacion(colegio.getLatitud().toString(),
-                            colegio.getLongitud().toString(),
-                            API_DYNAMIC_KEY);
+                    .getContaminacion(colegio.getLatitud(),
+                            colegio.getLongitud(),
+                            "14a282117d56847c14ed1f76e885fc6e9078450a");
 
             call_async.enqueue(new Callback<Contaminacion>() {
                 @Override
                 public void onResponse(Call<Contaminacion> call, Response<Contaminacion> response) {
                     assert response.body() != null;
-                    es.upm.miw.calidadairecolegiosvallecas.models.List contaminacion = response.body().getList().get(0);
-                    ColegioContaminacion cc = new ColegioContaminacion(
-                            colegio.getNombre(),
-                            contaminacion.getMain().getAqi(),
-                            contaminacion.getComponents()
-                    );
+                    Integer aqi = response.body().getData().getAqi();
+                    Iaqi iaqi = response.body().getData().getIaqi();
+                    ColegioContaminacion cc = new ColegioContaminacion(colegio.getNombre(), aqi, iaqi);
                     colegioContaminacionList.add(cc);
                     adapter.setColegioContaminacionList(colegioContaminacionList);
                 }
