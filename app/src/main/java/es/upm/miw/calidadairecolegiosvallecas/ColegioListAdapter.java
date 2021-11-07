@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import es.upm.miw.calidadairecolegiosvallecas.models.ColegioContaminacion;
-import es.upm.miw.calidadairecolegiosvallecas.room.Colegio;
 
 public class ColegioListAdapter extends RecyclerView.Adapter<ColegioListAdapter.ColegioViewHolder> {
 
@@ -47,13 +46,20 @@ public class ColegioListAdapter extends RecyclerView.Adapter<ColegioListAdapter.
     public void onBindViewHolder(@NonNull ColegioViewHolder holder, int position) {
         if (colegioContaminacionList != null) {
             ColegioContaminacion current = colegioContaminacionList.get(position);
-            holder.nombreColegio.setText(current.getNombre());
-            if (current.getAqi() < 2)
+            String emoji = "";
+            if (current.getAqi() < 2) {
                 holder.contaminacionBackground.setBackgroundColor(Color.parseColor("#76DA6B"));
-            if (current.getAqi() == 2)
+                emoji = "\uD83D\uDE03";
+            }
+            if (current.getAqi() == 2) {
                 holder.contaminacionBackground.setBackgroundColor(Color.parseColor("#DAC26B"));
-            if (current.getAqi() > 2)
+                emoji = "\uD83D\uDE10";
+            }
+            if (current.getAqi() > 2) {
                 holder.contaminacionBackground.setBackgroundColor(Color.parseColor("#DA6B6B"));
+                emoji = "\uD83D\uDE14";
+            }
+            holder.nombreColegio.setText(current.getNombre() + "\n" + emoji);
         }
     }
 
