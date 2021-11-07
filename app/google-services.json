@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "281486740313",
+    "project_id": "colegios-madrid-aq",
+    "storage_bucket": "colegios-madrid-aq.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:281486740313:android:e09d1174f465ab0f89da48",
+        "android_client_info": {
+          "package_name": "es.upm.miw.colegiosmadridaqi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "281486740313-4uqrh3okqms82ocu83ugpgdb48o4r5bp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "es.upm.miw.colegiosmadridaqi",
+            "certificate_hash": "7105da09745fb422cb51cc3d4fcc23328c3a1a87"
+          }
+        },
+        {
+          "client_id": "281486740313-dqdkrlc4qpdal5633ajqnoltonjti3ve.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqoaQbEjDvBKbVverVTlUilcQVMRt0ugw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "281486740313-dqdkrlc4qpdal5633ajqnoltonjti3ve.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

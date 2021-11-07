@@ -3,22 +3,29 @@ package es.upm.miw.colegiosmadridaqi;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import colegiosmadridaqi.BuildConfig;
 import colegiosmadridaqi.R;
 import es.upm.miw.colegiosmadridaqi.models.ColegioContaminacion;
 import es.upm.miw.colegiosmadridaqi.models.Colegios;
@@ -53,12 +60,16 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private static final int RC_SIGN_IN = 2018;
 
+    private FirebaseUser user = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         btnBuscar = findViewById(R.id.btnBuscar);
         etNombreColegio = findViewById(R.id.etNombreColegio);
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mAuthStateListener = firebaseAuth -> user = firebaseAuth.getCurrentUser();
         Retrofit retrofitDynamic = new Retrofit.Builder()
                 .baseUrl(API_DYNAMIC_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -78,16 +89,56 @@ public class MainActivity extends AppCompatActivity {
         colegioViewModel.getAllColegios().observe(this, this::fetchContaminacion);
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.login) {
+            if (user == null) {
+                iniciarSesion();
+                item.setTitle(R.string.logout);
+            } else {
+                cerrarSesion();
+                item.setTitle(R.string.login);
+            }
+        }
+        return true;
+    }
+
+    private void iniciarSesion() {
+        startActivityForResult(
+                // Get an instance of AuthUI based on the default app
+                AuthUI.getInstance().
+                        createSignInIntentBuilder().
+                        setAvailableProviders(Arrays.asList(
+                                new AuthUI.IdpConfig.GoogleBuilder().build(),
+                                new AuthUI.IdpConfig.EmailBuilder().build()
+                        )).
+                        setIsSmartLockEnabled(!BuildConfig.DEBUG /* credentials */, true /* hints */).
+                        build(),
+                RC_SIGN_IN
+        );
+    }
+
+    private void cerrarSesion() {
+        mFirebaseAuth.signOut();
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
-        //      mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-//        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
     private void fetchColegios() {
@@ -129,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        List<ColegioContaminacion> filteredList = new ArrayList<ColegioContaminacion>();
+        List<ColegioContaminacion> filteredList = new ArrayList<>();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             filteredList = colegioContaminacionList.stream()
                     .filter(colegioContaminacion ->
@@ -137,7 +188,6 @@ public class MainActivity extends AppCompatActivity {
                                     .contains(colegioNombre.toLowerCase()))
                     .collect(Collectors.toList());
         } else {
-            filteredList = new ArrayList<ColegioContaminacion>();
             for (ColegioContaminacion colegioContaminacion : colegioContaminacionList) {
                 if (colegioContaminacion.getNombre().toLowerCase()
                         .contains(colegioNombre.toLowerCase()))
