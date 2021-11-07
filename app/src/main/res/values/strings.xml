@@ -2,5 +2,6 @@
     <string name="app_name">AQVS</string>
     <string name="login">Iniciar sesión</string>
     <string name="logout">Cerrar sesión</string>
+    <string name="refresh">Actualizar</string>
 
 </resources>

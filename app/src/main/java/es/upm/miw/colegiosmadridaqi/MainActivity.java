@@ -103,14 +103,21 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.login) {
-            if (user == null) {
-                iniciarSesion();
-                item.setTitle(R.string.logout);
-            } else {
-                cerrarSesion();
-                item.setTitle(R.string.login);
-            }
+        switch (item.getItemId()) {
+            case R.id.login:
+                if (user == null) {
+                    iniciarSesion();
+                    item.setTitle(R.string.logout);
+                } else {
+                    cerrarSesion();
+                    item.setTitle(R.string.login);
+                }
+                break;
+            case R.id.refresh:
+                limpiarColegios(findViewById(R.id.btnLimpiar));
+                colegioViewModel.getAllColegios().observe(this, this::fetchContaminacion);
+                etNombreColegio.setText("");
+                break;
         }
         return true;
     }
@@ -201,14 +208,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void limpiarColegios(View v) {
-        etNombreColegio.setText("");
         adapter.setColegioContaminacionList(colegioContaminacionList);
     }
 
     private void fetchContaminacion(List<Colegio> colegios) {
-        // Retrofit call
         colegioContaminacionList = new ArrayList<>();
-
         for (Colegio colegio : colegios) {
             Call<Contaminacion> call_async = apiServiceContaminacion
                     .getContaminacion(colegio.getLatitud(),
