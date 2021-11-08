@@ -49,15 +49,19 @@ dependencies {
     // optional - Test helpers
     testImplementation "androidx.room:room-testing:$room_version"
     // Firebase
-    implementation 'com.google.firebase:firebase-core:16.0.4'
-    //implementation 'com.google.firebase:firebase-core:16.0.3'
+    implementation 'com.google.firebase:firebase-core:16.0.9'
+    implementation 'com.google.firebase:firebase-auth:17.0.0'
 
-    implementation 'com.google.firebase:firebase-auth:16.0.5'
+    // Firebase UI
+    implementation 'com.firebaseui:firebase-ui-auth:5.0.0'
+    implementation 'com.firebaseui:firebase-ui-database:5.0.0'
+    // Added for firebase
+    implementation platform('com.google.firebase:firebase-bom:28.4.2')
 
-    // https://github.com/firebase/FirebaseUI-Android/tree/master/auth
-    //implementation 'com.firebaseui:firebase-ui-auth:4.1.0'
-    implementation 'com.firebaseui:firebase-ui-auth:4.2.1'
-    implementation 'com.android.support:multidex:1.0.3'
+    // Declare the dependency for the Realtime Database library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-database'
+
     compileOnly 'org.glassfish:javax.annotation:3.1.1'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
