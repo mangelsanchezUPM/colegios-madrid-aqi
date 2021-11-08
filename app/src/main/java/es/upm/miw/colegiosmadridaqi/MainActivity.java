@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
     private ColegioViewModel colegioViewModel;
 
     private List<ColegioContaminacion> colegioContaminacionList;
-    private Button btnBuscar;
     private EditText etNombreColegio;
 
     private FirebaseAuth mFirebaseAuth;
@@ -65,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        btnBuscar = findViewById(R.id.btnBuscar);
         etNombreColegio = findViewById(R.id.etNombreColegio);
         mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthStateListener = firebaseAuth -> {
@@ -175,8 +173,8 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(Call<Colegios> call, Throwable t) {
                 Toast.makeText(
                         getApplicationContext(),
-                        "ERROR: " + t.getMessage(),
-                        Toast.LENGTH_LONG
+                        "Error al obtener Colegio",
+                        Toast.LENGTH_SHORT
                 ).show();
                 Log.e(LOG_TAG, t.getMessage());
             }
@@ -209,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void limpiarColegios(View v) {
         adapter.setColegioContaminacionList(colegioContaminacionList);
+        etNombreColegio.setText("");
     }
 
     private void fetchContaminacion(List<Colegio> colegios) {
@@ -232,6 +231,11 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<Contaminacion> call, Throwable t) {
+                    Toast.makeText(
+                            getApplicationContext(),
+                            "Error al obtener Calidad del Aire",
+                            Toast.LENGTH_SHORT
+                    ).show();
                     Log.e(LOG_TAG, t.getMessage());
                 }
             });

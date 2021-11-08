@@ -2,7 +2,7 @@
 <resources>
     <color name="very_good">#96DADA</color>
     <color name="good">#8DD695</color>
-    <color name="fair">#AF8567</color>
+    <color name="fair">#E1CF74</color>
     <color name="poor">#AF5454</color>
     <color name="very_poor">#835151</color>
     <color name="hazardous">#352121</color>
