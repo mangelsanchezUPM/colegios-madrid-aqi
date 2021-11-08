@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -59,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 2018;
 
     private FirebaseUser user = null;
+    private boolean created = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthStateListener = firebaseAuth -> {
             user = firebaseAuth.getCurrentUser();
-            if (user == null)
+            if (user == null && created)
                 Toast.makeText(getApplicationContext(), "Sesión cerrada", Toast.LENGTH_SHORT).show();
             else
                 Toast.makeText(getApplicationContext(), "Sesión iniciada como " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         fetchColegios();
         colegioViewModel.getAllColegios().observe(this, this::fetchContaminacion);
+        created = true;
     }
 
 
@@ -184,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
     public void buscarColegio(View v) {
         String colegioNombre = this.etNombreColegio.getText().toString();
         if (colegioNombre.isEmpty()) {
-            adapter.setColegioContaminacionList(colegioContaminacionList);
+            adapter.setColegioContaminacionList(colegioContaminacionList, user);
             return;
         }
 
@@ -202,11 +203,11 @@ public class MainActivity extends AppCompatActivity {
                     filteredList.add(colegioContaminacion);
             }
         }
-        adapter.setColegioContaminacionList(filteredList);
+        adapter.setColegioContaminacionList(filteredList, user);
     }
 
     public void limpiarColegios(View v) {
-        adapter.setColegioContaminacionList(colegioContaminacionList);
+        adapter.setColegioContaminacionList(colegioContaminacionList, user);
         etNombreColegio.setText("");
     }
 
@@ -226,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
                     Iaqi iaqi = response.body().getData().getIaqi();
                     ColegioContaminacion cc = new ColegioContaminacion(colegio.getNombre(), aqi, iaqi);
                     colegioContaminacionList.add(cc);
-                    adapter.setColegioContaminacionList(colegioContaminacionList);
+                    adapter.setColegioContaminacionList(colegioContaminacionList, user);
                 }
 
                 @Override

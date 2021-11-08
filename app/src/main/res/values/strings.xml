@@ -3,5 +3,6 @@
     <string name="login">Iniciar sesión</string>
     <string name="logout">Cerrar sesión</string>
     <string name="refresh">Actualizar</string>
+    <string name="guardar">Guardar Registro</string>
 
 </resources>
