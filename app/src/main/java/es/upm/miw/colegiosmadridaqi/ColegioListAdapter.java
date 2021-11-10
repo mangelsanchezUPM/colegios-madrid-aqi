@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Date;
 import java.util.List;
 
 import colegiosmadridaqi.R;
@@ -34,6 +35,7 @@ public class ColegioListAdapter extends RecyclerView.Adapter<ColegioListAdapter.
     private final LayoutInflater mInflater;
     private List<ColegioContaminacion> colegioContaminacionList;
     private FirebaseUser user;
+    private long fechaActualizacion;
 
     public ColegioListAdapter(Context context) {
         mInflater = LayoutInflater.from(context);
@@ -91,6 +93,8 @@ public class ColegioListAdapter extends RecyclerView.Adapter<ColegioListAdapter.
                 intent.putExtra("wg", current.getIaqi().getWg().getV());
 
                 intent.putExtra("user", user);
+                intent.putExtra("fechaActualizacion", fechaActualizacion);
+
                 holder.itemView.getContext().startActivity(intent);
             });
         }
@@ -103,9 +107,10 @@ public class ColegioListAdapter extends RecyclerView.Adapter<ColegioListAdapter.
                 : colegioContaminacionList.size();
     }
 
-    public void setColegioContaminacionList(List<ColegioContaminacion> colegioContaminacionList, FirebaseUser user) {
+    public void setColegioContaminacionList(List<ColegioContaminacion> colegioContaminacionList, FirebaseUser user, long fechaActualizacion) {
         this.colegioContaminacionList = colegioContaminacionList;
         this.user = user;
+        this.fechaActualizacion = fechaActualizacion;
         notifyDataSetChanged();
     }
 }

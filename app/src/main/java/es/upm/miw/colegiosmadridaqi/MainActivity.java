@@ -1,5 +1,6 @@
 package es.upm.miw.colegiosmadridaqi;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +21,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseUser user = null;
     private boolean created = false;
+    private long fechaActualizacion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Sesión cerrada", Toast.LENGTH_SHORT).show();
             else
                 Toast.makeText(getApplicationContext(), "Sesión iniciada como " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+            adapter.setColegioContaminacionList(colegioContaminacionList, user, fechaActualizacion);
         };
         Retrofit retrofitDynamic = new Retrofit.Builder()
                 .baseUrl(API_DYNAMIC_BASE_URL)
@@ -116,6 +120,10 @@ public class MainActivity extends AppCompatActivity {
                 limpiarColegios(findViewById(R.id.btnLimpiar));
                 colegioViewModel.getAllColegios().observe(this, this::fetchContaminacion);
                 etNombreColegio.setText("");
+                break;
+            case R.id.records:
+                Intent intent = new Intent(getApplicationContext(), RecordsActivity.class);
+                startActivity(intent);
                 break;
         }
         return true;
@@ -184,8 +192,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void buscarColegio(View v) {
         String colegioNombre = this.etNombreColegio.getText().toString();
+
         if (colegioNombre.isEmpty()) {
-            adapter.setColegioContaminacionList(colegioContaminacionList, user);
+            adapter.setColegioContaminacionList(colegioContaminacionList, user, fechaActualizacion);
             return;
         }
 
@@ -203,16 +212,17 @@ public class MainActivity extends AppCompatActivity {
                     filteredList.add(colegioContaminacion);
             }
         }
-        adapter.setColegioContaminacionList(filteredList, user);
+        adapter.setColegioContaminacionList(filteredList, user, fechaActualizacion);
     }
 
     public void limpiarColegios(View v) {
-        adapter.setColegioContaminacionList(colegioContaminacionList, user);
+        adapter.setColegioContaminacionList(colegioContaminacionList, user, fechaActualizacion);
         etNombreColegio.setText("");
     }
 
     private void fetchContaminacion(List<Colegio> colegios) {
         colegioContaminacionList = new ArrayList<>();
+        fechaActualizacion = (new Date()).getTime();
         for (Colegio colegio : colegios) {
             Call<Contaminacion> call_async = apiServiceContaminacion
                     .getContaminacion(colegio.getLatitud(),
@@ -227,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
                     Iaqi iaqi = response.body().getData().getIaqi();
                     ColegioContaminacion cc = new ColegioContaminacion(colegio.getNombre(), aqi, iaqi);
                     colegioContaminacionList.add(cc);
-                    adapter.setColegioContaminacionList(colegioContaminacionList, user);
+                    adapter.setColegioContaminacionList(colegioContaminacionList, user, fechaActualizacion);
                 }
 
                 @Override

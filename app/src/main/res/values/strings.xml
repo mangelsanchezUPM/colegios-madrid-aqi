@@ -1,8 +1,9 @@
 <resources>
-    <string name="app_name">AQVS</string>
+    <string name="app_name">Colegios Madrid AQI</string>
     <string name="login">Iniciar sesión</string>
     <string name="logout">Cerrar sesión</string>
     <string name="refresh">Actualizar</string>
     <string name="guardar">Guardar Registro</string>
+    <string name="records">Ver Record</string>
 
 </resources>

@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,8 +30,8 @@ public class DetallesActivity extends AppCompatActivity {
     private Integer aqi;
     private String nombreColegio;
     private FirebaseUser user;
-    private FirebaseDatabase database;
-    private DatabaseReference myRef;
+    private long fechaActualizacion;
+    private DatabaseReference mDatabase;
 
     private final String DB_URL = "https://colegios-madrid-aq-default-rtdb.europe-west1.firebasedatabase.app/";
 
@@ -54,7 +55,10 @@ public class DetallesActivity extends AppCompatActivity {
             else if (aqi > 200) aqiBtn.setBackgroundColor(getColor(R.color.hazardous));
             nombreColegio = extras.getString("nombreColegio");
             nombreColegioTV.setText(nombreColegio);
+
             user = (FirebaseUser) extras.get("user");
+
+            fechaActualizacion = extras.getLong("fechaActualizacion");
 
             ((TextView) findViewById(R.id.h)).setText("H: " + extras.getDouble("h"));
             ((TextView) findViewById(R.id.no2)).setText("NO2: " + extras.getDouble("no2"));
@@ -65,8 +69,7 @@ public class DetallesActivity extends AppCompatActivity {
             ((TextView) findViewById(R.id.w)).setText("W: " + extras.getDouble("w"));
             ((TextView) findViewById(R.id.wg)).setText("WG: " + extras.getDouble("wg"));
 
-            database = FirebaseDatabase.getInstance(DB_URL);
-            myRef = database.getReference("aqi-colegios");
+            mDatabase = FirebaseDatabase.getInstance(DB_URL).getReference();
 
             Button btnGuardar = findViewById(R.id.btnGuardar);
             if (user == null) btnGuardar.setVisibility(View.INVISIBLE);
@@ -76,7 +79,8 @@ public class DetallesActivity extends AppCompatActivity {
                     registro.put("usuario", user.getDisplayName());
                     registro.put("colegio", nombreColegio);
                     registro.put("aqi", aqi);
-                    myRef.setValue(registro);
+                    registro.put("fecha", fechaActualizacion);
+                    mDatabase.child(user.getDisplayName() + "-" + nombreColegio + "-" + fechaActualizacion).setValue(registro);
                     Toast.makeText(this.getApplicationContext(), "Registro insertado", Toast.LENGTH_SHORT).show();
                 });
             }
